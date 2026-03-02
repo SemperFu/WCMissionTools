@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="WCMissionCore/WCMissionCore.csproj" />
+  <Project Path="WCMissionParser/WCMissionParser.csproj" />
+  <Project Path="WCMissionPacker/WCMissionPacker.csproj" />
+  <Project Path="WCMissionViewer/WCMissionViewer.csproj" />
+</Solution>

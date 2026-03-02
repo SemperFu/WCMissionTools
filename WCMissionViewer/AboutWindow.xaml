@@ -1,0 +1,30 @@
+<Window x:Class="WCMissionViewer.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="About WC Mission Viewer" 
+        Width="420" Height="280" 
+        ResizeMode="NoResize" 
+        WindowStartupLocation="CenterOwner"
+        Background="#1e1e2e">
+    <StackPanel Margin="20">
+        <TextBlock Text="WC Mission Viewer" FontSize="16" FontWeight="Bold" Foreground="White" />
+        <TextBlock Text="A visual viewer for Wing Commander 1 &amp; 2 MODULE files." 
+                   Foreground="#cccccc" Margin="0,8,0,0" TextWrapping="Wrap" />
+        <TextBlock Text="Built with .NET 10" Foreground="#888888" Margin="0,16,0,0" />
+        <TextBlock Margin="0,8,0,0">
+            <Hyperlink NavigateUri="https://github.com/SemperFu/WCMissionTools" 
+                       RequestNavigate="Hyperlink_Navigate"
+                       Foreground="#4090ff">
+                github.com/SemperFu/WCMissionTools
+            </Hyperlink>
+        </TextBlock>
+        <TextBlock Text="Made possible by the Wing Commander reverse-engineering community." 
+                   Foreground="#888888" Margin="0,16,0,0" TextWrapping="Wrap" FontSize="11" />
+        <TextBlock Foreground="#666666" Margin="0,8,0,0" TextWrapping="Wrap" FontSize="10">
+            Wing Commander is a trademark of Electronic Arts Inc. This is an unofficial fan-made tool, not affiliated with or endorsed by EA.
+        </TextBlock>
+        <Button Content="OK" Width="80" HorizontalAlignment="Right" Margin="0,16,0,0" 
+                Click="OK_Click" IsDefault="True"
+                Background="#333355" Foreground="White" BorderBrush="#555577" />
+    </StackPanel>
+</Window>

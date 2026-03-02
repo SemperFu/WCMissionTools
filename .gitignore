@@ -1,0 +1,31 @@
+# Build output
+bin/
+obj/
+
+# IDE / editor
+.vs/
+*.user
+*.suo
+*.DotSettings.user
+
+# AI agent sessions
+.claude/
+
+# AI agent instruction files (not needed in repo)
+AGENTS.md
+CLAUDE.md
+.github/copilot-instructions.md
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Archives
+*.zip
+
+# Databases
+*.db
+*.sqlite
+
+# Temp / test output
+*.packed.*
