@@ -8,7 +8,7 @@ namespace WCMissionCore;
 /// File structure (uncompressed):
 ///   Header: 4 bytes file size + 6x4-byte section entries + sentinel
 ///   Section 0 (offset 28):     Campaign routing data
-///   Section 1 (offset ~1564):  Briefing text references  
+///   Section 1 (offset ~1564):  Encounter titles — 4 difficulty pools × 16 entries × 77 bytes
 ///   Nav Points (offset 6492):  15 systems x 4928 bytes/system
 ///     Each system: 4 missions x 1232 bytes/mission
 ///     Each mission: 16 nav slots x 77 bytes/nav
@@ -32,6 +32,13 @@ public class ModuleParser
     const int ShipRecordSize = 42;      // bytes per ship
     const int ShipsPerMission = 32;     // max ship slots per mission
     const int ShipBlockSize = ShipRecordSize * ShipsPerMission; // 1344
+
+    // Section 1: Encounter titles — 4 difficulty pools × 16 encounter slots × 77 bytes each
+    // Pool 0=Beginner, 1=Easy, 2=Hard, 3=Ace. Each record's first 30 bytes hold the encounter name.
+    const int EncounterTitleSectionOffset = 1564;
+    const int EncounterTitlePoolSize = 16;          // 16 sortie slots per difficulty pool
+    const int EncounterTitleRecordSize = NavRecordSize; // same 77-byte record layout, name at bytes 0-29
+    const int EncounterTitleDifficulties = 4;
 
     const int WingSectionOffset = 231964;  // section 4: difficulty names (160 bytes) + wing names (40 bytes each)
     const int WingEntryOffset = 160;       // wing names start after 4×40 byte difficulty names
@@ -135,13 +142,29 @@ public class ModuleParser
         if (sysOff + SystemNameEntrySize <= data.Length)
             sysName = ReadString(data, sysOff, SystemNameEntrySize);
 
+        // Read encounter titles from section 1 (4 difficulty pools × 16 slots × 77 bytes)
+        // Sortie index is used as the slot within each pool (valid for sorties 0..15).
+        // For sorties 16+, each pool wraps: slot = sortie % EncounterTitlePoolSize.
+        var encounterTitles = new string[EncounterTitleDifficulties];
+        for (int d = 0; d < EncounterTitleDifficulties; d++)
+        {
+            int slot = sortie % EncounterTitlePoolSize;
+            int eTitleOff = EncounterTitleSectionOffset
+                + d * EncounterTitlePoolSize * EncounterTitleRecordSize
+                + slot * EncounterTitleRecordSize;
+            encounterTitles[d] = eTitleOff + 30 <= data.Length
+                ? ReadString(data, eTitleOff, 30)
+                : "";
+        }
+
         var mission = new Mission
         {
             SortieIndex = sortie,
             SystemIndex = sys,
             MissionIndex = mis,
             WingName = wingName,
-            SystemName = sysName
+            SystemName = sysName,
+            EncounterTitles = encounterTitles
         };
 
         ParseNavPoints(data, sys, mis, mission);
@@ -173,6 +196,9 @@ public class ModuleParser
 
             // Skip empty nav slots
             if (string.IsNullOrEmpty(name) && navType == 0) continue;
+
+            // Sphere radius at offset 31 (1-byte value, unit = 1000 in-game units)
+            int radius = data[off + 31] * 1000;
 
             int x = ReadSigned24(data, off + 32);
             int y = ReadSigned24(data, off + 36);
@@ -207,6 +233,7 @@ public class ModuleParser
                 Name = name,
                 NavType = navType,
                 X = x, Y = y, Z = z,
+                Radius = radius,
                 Triggers = triggers,
                 Preloads = [.. preloads],
                 ShipIndices = [.. shipIndices]

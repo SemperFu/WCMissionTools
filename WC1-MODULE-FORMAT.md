@@ -20,7 +20,7 @@ Detection: check byte 7 (first section's type byte). Type 1 = compressed, type 2
 | Section | Content | Preamble | Record Size | Layout |
 |---------|---------|----------|-------------|--------|
 | 0 | Campaign routing | -- | -- | 1,536 bytes of binary routing data |
-| 1 | Encounter titles | -- | 77 bytes | 4 difficulty blocks x 16 records; flavor text for encounters |
+| 1 | Encounter titles | -- | 77 bytes | 4 difficulty pools x 16 sortie slots; name at bytes 0-29 of each record |
 | 2 | Nav points + briefing text | 4,928 bytes | 77 bytes/nav | 16 navs x 4 missions x 15 systems |
 | 3 | Map descriptions | 4,097 bytes | 64 bytes/map | 16 entries per sortie (flat) |
 | 4 | Ship definitions | 5,376 bytes | 42 bytes/ship | 32 ships per sortie (flat) |
@@ -28,6 +28,10 @@ Detection: check byte 7 (first section's type byte). Type 1 = compressed, type 2
 | 6 | System/squadron names | -- | 40 bytes | "Squadron" header + system names |
 
 **Important:** Each section has a preamble before mission data starts. The parser uses absolute offsets: navs at 6492, maps at 84509, ships at 151324.
+
+### Section 1 -- Encounter Titles (offset 1564)
+
+Four consecutive difficulty pools of 16 records each (pool 0=Beginner, 1=Easy, 2=Hard, 3=Ace). Each record is 77 bytes in the same layout as a nav record; the encounter title is a null-terminated ASCII string at bytes 0-29. The sortie slot within each pool is derived as `sortieIndex % 16`. Examples: "12:00 at O.K. Corral", "Solo Flight".
 
 ### Section 5 -- Wing Assignments (offset 231964)
 

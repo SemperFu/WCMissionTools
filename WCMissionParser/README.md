@@ -21,9 +21,10 @@ A .NET 10 class library and CLI tool for parsing Wing Commander 1 & 2 binary MOD
 - **MODULE.002** -- Special Operations 2: **60 missions**
 
 Per mission:
-- **Nav points** -- names, 3D coordinates, ship assignments, triggers, preloads, briefing notes
+- **Nav points** -- names, 3D coordinates, sphere radius, ship assignments, triggers, preloads, briefing notes
 - **Ships** -- class, allegiance, leader/wingman chains, AI orders, positions, named pilots (WC1) or characters (WC2)
 - **Briefings** -- map objective text (WC1) or flight plan entries with objective icons (WC2)
+- **Encounter titles** (WC1) -- difficulty-based encounter flavor text from Section 1 ("12:00 at O.K. Corral", "Solo Flight")
 
 Per campaign (CAMP files):
 - **Series branches** -- win/lose branching tree, ship assignments, wingman, score thresholds
@@ -173,7 +174,7 @@ MODULE.000.json       (or MODULE.000.xml)
 
 Exports use **game-specific field names** — WC1 and WC2 missions have different schemas reflecting each game's data structures. Enums are serialized as strings (e.g., `"Kilrathi"` not `1`). All fields are always present (zero/default values are included, never omitted).
 
-**WC1 mission fields:** SortieIndex, SystemIndex, MissionIndex, WingName, SystemName, NavPoints (Name, NavType, XYZ, Radius, BriefingNote, Triggers, Preloads, ShipIndices), Ships (Class, Allegiance, Leader, Orders, Pilot, XYZ, Rotation, Speed, AiLevel, PrimaryTarget, SecondaryTarget, Formation), MapPoints (IconFormat, TargetIndex, Description)
+**WC1 mission fields:** SortieIndex, SystemIndex, MissionIndex, WingName, SystemName, EncounterTitles (4 strings indexed by difficulty: Beginner/Easy/Hard/Ace), NavPoints (Name, NavType, XYZ, Radius, BriefingNote, Triggers, Preloads, ShipIndices), Ships (Class, Allegiance, Leader, Orders, Pilot, XYZ, Rotation, Speed, AiLevel, PrimaryTarget, SecondaryTarget, Formation), MapPoints (IconFormat, TargetIndex, Description)
 
 **WC2 mission fields:** SortieIndex, SystemIndex, MissionIndex, MissionLabel, SystemName, NavPoints (same as WC1), Ships (Class, Allegiance, Leader, Orders, Character, XYZ, Rotation, Speed, AiLevel, PrimaryTarget, SecondaryTarget, FormationSlot), FlightPlans (ObjectiveIcon, TargetNav, Description)
 
@@ -204,7 +205,7 @@ Exports use **game-specific field names** — WC1 and WC2 missions have differen
 ## Known Limitations
 
 - **Map point icon codes** -- Some briefing text entries have a leading `.` character (encounter points); shown as-is from the binary data.
-- **Encounter titles unused** -- Section 1 contains difficulty-based encounter flavor text (e.g., "12:00 at O.K. Corral", "Solo Flight") but these are not yet surfaced.
+- **Encounter title mapping** -- Section 1 encounter titles are read using sortie index modulo 16 within each difficulty pool. The exact mapping from sortie to difficulty pool entry is inferred from the documented 4×16 structure; verified field-by-field reverse-engineering of the pool index per sortie has not been done.
 - **WC2 mission headers** -- Fields like InitialSphere, Carrier, TakeoffShip are known from editor output but their binary offsets are not yet mapped.
 - **WC2 orders field** -- All tested WC2 missions show orders=0 (Patrol); non-zero order values have not been observed yet.
 - **SO1/SO2 hazard class IDs** -- Each expansion uses different ship class IDs for asteroids and mines (base=33/34, SO1=41/42, SO2=51/52). Class 41 is asteroids in SO1 but the MorningStar fighter in SO2. The parser and viewer handle this automatically based on the MODULE file number.

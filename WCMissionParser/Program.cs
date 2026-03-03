@@ -229,13 +229,25 @@ void RunWc1(string modulePath, int? filterSortie, bool exportJson, bool exportXm
         string wing = string.IsNullOrEmpty(mission.WingName)? "" : $" -- {mission.WingName}";
         string sys = string.IsNullOrEmpty(mission.SystemName) ? "" : $" [{mission.SystemName}]";
         Console.WriteLine($"\n=== Sortie {mission.SortieIndex} (System {mission.SystemIndex}, Mission {mission.MissionIndex}){sys}{wing} ===");
+
+        // Show encounter titles if any non-empty values exist
+        var titles = mission.EncounterTitles;
+        string[] diffNames = ["Beginner", "Easy", "Hard", "Ace"];
+        bool hasTitle = titles.Any(t => !string.IsNullOrEmpty(t));
+        if (hasTitle)
+        {
+            string titleStr = string.Join(" / ", titles.Select((t, i) => string.IsNullOrEmpty(t) ? null : $"{diffNames[i]}: \"{t}\"").Where(s => s != null));
+            Console.WriteLine($"  Encounter: {titleStr}");
+        }
+
         Console.WriteLine($"  Nav Points: {mission.NavPoints.Count}");
         foreach (var nav in mission.NavPoints)
         {
             string shipList = nav.ShipIndices.Length > 0
                 ? string.Join(",", nav.ShipIndices)
                 : "none";
-            Console.WriteLine($"    [{nav.Index}] \"{nav.Name}\" XYZ=({nav.X},{nav.Y},{nav.Z}) ships=[{shipList}]");
+            string radiusStr = nav.Radius > 0 ? $" radius={nav.Radius}" : "";
+            Console.WriteLine($"    [{nav.Index}] \"{nav.Name}\" XYZ=({nav.X},{nav.Y},{nav.Z}){radiusStr} ships=[{shipList}]");
         }
 
         Console.WriteLine($"  Map Points: {mission.MapPoints.Count}");

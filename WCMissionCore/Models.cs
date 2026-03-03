@@ -64,6 +64,13 @@ public class Mission
     public int MissionIndex { get; set; }
     public string WingName { get; set; } = "";
     public string SystemName { get; set; } = "";
+
+    /// <summary>
+    /// Encounter title for this sortie per difficulty level (index 0=Beginner, 1=Easy, 2=Hard, 3=Ace).
+    /// Empty string means no title defined at that difficulty. Populated from MODULE Section 1.
+    /// </summary>
+    public string[] EncounterTitles { get; set; } = ["", "", "", ""];
+
     public List<NavPoint> NavPoints { get; set; } = [];
     public List<MapPoint> MapPoints { get; set; } = [];
     public List<Ship> Ships { get; set; } = [];
