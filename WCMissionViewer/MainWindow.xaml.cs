@@ -232,6 +232,7 @@ public partial class MainWindow : Window
         };
         AddDetailRow("Type", typeName);
         AddDetailRow("Position", $"({nav.X}, {nav.Y}, {nav.Z})");
+        if (nav.Radius > 0) AddDetailRow("Radius", $"{nav.Radius:N0}");
 
         // Show briefing notes — check this nav and any colocated navs
         var notes = new List<string>();
